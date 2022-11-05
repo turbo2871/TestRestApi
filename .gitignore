@@ -1,1 +1,4 @@
 .idea
+docker/mysql/dbdata/
+docker/nginx-proxy/docker
+docker-configs
