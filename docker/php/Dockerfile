@@ -16,8 +16,6 @@ RUN apt-get install -y zlib1g-dev g++ librdkafka-dev git libicu-dev \
 RUN docker-php-ext-configure gd --with-jpeg --with-webp --with-freetype
 RUN docker-php-ext-install gd
 
-RUN curl -sS https://get.symfony.com/cli/installer | bash
-
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
 WORKDIR /var/www/project

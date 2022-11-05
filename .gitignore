@@ -2,3 +2,6 @@
 docker/mysql/dbdata/
 docker/nginx-proxy/docker
 docker-configs
+docker/redis/data/log/redis-server.log
+docker/redis/data/bases/dump.rdb
+docker/redis/data/bases/appendonlydir/
