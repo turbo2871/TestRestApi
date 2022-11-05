@@ -1,0 +1,70 @@
+version: '3'
+
+networks:
+    frontend:
+        external:
+            name: nginx-proxy_proxy
+    backend:
+
+services:
+    nginx:
+        image: nginx:stable-alpine
+        container_name: nginx_test_rest_api
+        volumes:
+            - './:/var/www/project'
+            - './certs:/etc/nginx/certs'
+            - './docker/nginx/default.conf:/etc/nginx/conf.d/default.conf'
+        depends_on:
+            - php74
+        environment:
+            VIRTUAL_HOST: api.local
+            VIRTUAL_PORT: 443
+            VIRTUAL_PROTO: https
+        networks:
+            - frontend
+            - backend
+        entrypoint: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+
+    php74:
+#        platform: linux/amd64
+        build:
+            context: '.'
+            dockerfile: './docker/php/Dockerfile'
+        container_name: php74_test_rest_api
+        volumes:
+            - ./:/var/www/project
+            - ./docker/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
+        networks:
+            - backend
+
+    redis:
+        image: redis:latest
+        container_name: redis_test_rest_api
+        ports:
+            - 6389:6389
+        volumes:
+            - ./docker/redis/etc/redis.conf:/usr/local/etc/redis/redis.conf
+            - ./docker/redis/data:/data
+        command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+        networks:
+            - backend
+
+    database:
+#        platform: linux/amd64
+        container_name: database_test_rest_api
+        image: mysql:5.7
+        restart: unless-stopped
+        tty: true
+        command: --default-authentication-plugin=mysql_native_password
+        environment:
+            MYSQL_ROOT_PASSWORD: api_root_password
+            MYSQL_DATABASE: api_docker
+            MYSQL_USER: symfony
+            MYSQL_PASSWORD: api_mysql_password
+        ports:
+            - '4307:3307'
+        volumes:
+            - ./docker/mysql/my.cnf:/etc/mysql/my.cnf
+            - ./docker/mysql/dbdata:/var/lib/mysql
+        networks:
+            - backend
