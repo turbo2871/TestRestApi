@@ -1,11 +1,24 @@
 <?php
 
-require_once PROJECT_ROOT_PATH . "/Model/Database.php";
+require_once PROJECT_ROOT_PATH."/Model/Database.php";
 
 class UserModel extends Database
 {
     public function getUsers($limit)
     {
-        return $this->select("SELECT * FROM users ORDER BY user_id ASC LIMIT ?", [1, $limit]);
+        $paramsArr = array(
+            array('param' => 1, 'value' => $limit),
+        );
+        return $this->select("SELECT * FROM users ORDER BY id ASC LIMIT ?", $paramsArr);
+    }
+
+    public function registerUser($userDataObj)
+    {
+        $paramsArr = array(
+            array('param' => 1, 'value' => $userDataObj->username),
+            array('param' => 2, 'value' => $userDataObj->password),
+            array('param' => 3, 'value' => $userDataObj->user_email),
+        );
+        return $this->insert("INSERT INTO users (username, password, user_email) VALUES (? ,? ,?)", $paramsArr);
     }
 }

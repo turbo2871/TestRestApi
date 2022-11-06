@@ -18,11 +18,19 @@ class Database
     {
         try {
             $stmt = $this->executeStatement($query, $params);
-            $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-            $stmt->close();
 
-            return $result;
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch(Exception $e) {
+            throw New Exception( $e->getMessage() );
+        }
+        return false;
+    }
+
+    public function insert($query = "" , $params = [])
+    {
+        try {
+            return $this->executeStatement($query, $params);
+        }catch(Exception $e) {
             throw New Exception( $e->getMessage() );
         }
         return false;
@@ -38,7 +46,13 @@ class Database
             }
 
             if( $params ) {
-                $stmt->bindParam($params[0], $params[1], PDO::PARAM_INT);
+                foreach ( $params as $item) {
+                    $type = PDO::PARAM_STR;
+                    if ((int) $item['value'] != 0) {
+                        $type = PDO::PARAM_INT;
+                    }
+                    $stmt->bindParam($item['param'], $item['value'], $type);
+                }
             }
 
             $stmt->execute();
