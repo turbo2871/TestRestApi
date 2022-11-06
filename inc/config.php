@@ -1,5 +1,5 @@
 <?php
-define("DB_HOST", "localhost");
-define("DB_USERNAME", "demo");
-define("DB_PASSWORD", "demo");
-define("DB_DATABASE_NAME", "rest_api_demo");
+define("DB_HOST", "database_test_rest_api");
+define("DB_USERNAME", "symfony");
+define("DB_PASSWORD", "mysql_password");
+define("DB_DATABASE_NAME", "api_docker");
