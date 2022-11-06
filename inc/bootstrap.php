@@ -13,3 +13,6 @@ require_once PROJECT_ROOT_PATH."/Model/UserModel.php";
 
 // include the jwt service file
 require_once PROJECT_ROOT_PATH."/Service/JwtService.php";
+
+// include the redis cache service file
+require_once PROJECT_ROOT_PATH."/Service/RedisCacheService.php";

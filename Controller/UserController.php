@@ -57,6 +57,7 @@ class UserController extends BaseController
             $data = json_decode(file_get_contents("php://input", true));
             try {
                 $userModel = new UserModel();
+                $cacheService = new RedisCacheService();
 
                 $result = $userModel->getUser($data, 1);
 
@@ -68,6 +69,7 @@ class UserController extends BaseController
                     $headers = array('alg'=>'HS256','typ'=>'JWT');
                     $payload = array('username' => $row['username'], 'user_email' => $row['user_email'], 'exp' => (time() + 60));
                     $jwt = JwtService::generate_jwt($headers, $payload);
+                    $cacheService->set('token_'.md5($row['username'].$row['user_email']), $jwt);
                     $responseData = json_encode(array('token' => $jwt));
                 }
             } catch (Error $e) {
