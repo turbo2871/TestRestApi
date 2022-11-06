@@ -49,7 +49,40 @@ class UserController extends BaseController
      */
     public function tokenAction()
     {
+        $strErrorDesc = '';
+        $requestMethod = $_SERVER["REQUEST_METHOD"];
 
+        if (strtoupper($requestMethod) == 'POST') {
+            // get posted data
+            $data = json_decode(file_get_contents("php://input", true));
+            try {
+                $userModel = new UserModel();
+
+                $result = $userModel->getUser($data, 1);
+
+                if(count($result) < 1) {
+                    $strErrorDesc = json_encode(array('error' => 'Invalid User'));
+                } else {
+                    print_r(json_encode($result));exit;
+
+                }
+            } catch (Error $e) {
+                $strErrorDesc = $e->getMessage().'Something went wrong! Please contact support.';
+                $strErrorHeader = 'HTTP/1.1 500 Internal Server Error';
+            }
+
+            // send output
+            if (!$strErrorDesc) {
+                $this->sendOutput(
+                    $responseData,
+                    array('Content-Type: application/json', 'HTTP/1.1 200 OK')
+                );
+            } else {
+                $this->sendOutput(json_encode(array('error' => $strErrorDesc)),
+                    array('Content-Type: application/json', $strErrorHeader)
+                );
+            }
+        }
     }
 
     /**
