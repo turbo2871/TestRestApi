@@ -63,8 +63,12 @@ class UserController extends BaseController
                 if(count($result) < 1) {
                     $strErrorDesc = json_encode(array('error' => 'Invalid User'));
                 } else {
-                    print_r(json_encode($result));exit;
+                    $row = current($result);
 
+                    $headers = array('alg'=>'HS256','typ'=>'JWT');
+                    $payload = array('username' => $row['username'], 'user_email' => $row['user_email'], 'exp' => (time() + 60));
+                    $jwt = JwtService::generate_jwt($headers, $payload);
+                    $responseData = json_encode(array('token' => $jwt));
                 }
             } catch (Error $e) {
                 $strErrorDesc = $e->getMessage().'Something went wrong! Please contact support.';
