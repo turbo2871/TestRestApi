@@ -45,4 +45,13 @@ class UserModel extends Database
 
         return $this->insert("INSERT INTO users (username, password, user_email) VALUES (? ,? ,?)", $paramsArr);
     }
+
+    public function deleteUser($id)
+    {
+        $paramsArr = array(
+            array('param' => 1, 'value' => $id),
+        );
+
+        return $this->delete("DELETE FROM users WHERE id = ?", $paramsArr);
+    }
 }
