@@ -2,7 +2,7 @@
 
 class JwtService
 {
-    public static function generate_jwt($headers, $payload, $secret = 'secret') {
+    public static function generateJwt($headers, $payload, $secret = 'secret') {
         $headers_encoded = self::base64url_encode(json_encode($headers));
 
         $payload_encoded = self::base64url_encode(json_encode($payload));
@@ -15,7 +15,7 @@ class JwtService
         return $jwt;
     }
 
-    public function is_jwt_valid($jwt, $secret = 'secret') {
+    public static function isJwtValid($jwt, $secret = 'secret') {
         // split the jwt
         $tokenParts = explode('.', $jwt);
         $header = base64_decode($tokenParts[0]);
