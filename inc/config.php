@@ -6,3 +6,4 @@ define("DB_DATABASE_NAME", "api_docker");
 define("REDIS_HOST", "redis_test_rest_api");
 define("REDIS_PORT", 6379);
 define("REDIS_PASSWORD", "foobared");
+define("REDIS_PREFIX_TOKEN", "token_");

@@ -61,33 +61,36 @@ class UserController extends BaseController
 
                 $result = $userModel->getUser($data, 1);
 
-                if(count($result) < 1) {
+                if (count($result) < 1) {
                     $strErrorDesc = json_encode(array('error' => 'Invalid User'));
                 } else {
                     $row = current($result);
 
-                    $headers = array('alg'=>'HS256','typ'=>'JWT');
+                    $headers = array('alg' => 'HS256', 'typ' => 'JWT');
                     $payload = array('username' => $row['username'], 'user_email' => $row['user_email'], 'exp' => (time() + 60));
                     $jwt = JwtService::generate_jwt($headers, $payload);
-                    $cacheService->set('token_'.md5($row['username'].$row['user_email']), $jwt);
+                    $cacheService->set(REDIS_PREFIX_TOKEN.$jwt, json_encode(array('username' => $row['username'], 'user_email' => $row['user_email'])));
                     $responseData = json_encode(array('token' => $jwt));
                 }
             } catch (Error $e) {
-                $strErrorDesc = $e->getMessage().'Something went wrong! Please contact support.';
+                $strErrorDesc = $e->getMessage() . 'Something went wrong! Please contact support.';
                 $strErrorHeader = 'HTTP/1.1 500 Internal Server Error';
             }
+        } else {
+            $strErrorDesc = 'Method not supported';
+            $strErrorHeader = 'HTTP/1.1 422 Unprocessable Entity';
+        }
 
-            // send output
-            if (!$strErrorDesc) {
-                $this->sendOutput(
-                    $responseData,
-                    array('Content-Type: application/json', 'HTTP/1.1 200 OK')
-                );
-            } else {
-                $this->sendOutput(json_encode(array('error' => $strErrorDesc)),
-                    array('Content-Type: application/json', $strErrorHeader)
-                );
-            }
+        // send output
+        if (!$strErrorDesc) {
+            $this->sendOutput(
+                $responseData,
+                array('Content-Type: application/json', 'HTTP/1.1 200 OK')
+            );
+        } else {
+            $this->sendOutput(json_encode(array('error' => $strErrorDesc)),
+                array('Content-Type: application/json', $strErrorHeader)
+            );
         }
     }
 
@@ -96,7 +99,48 @@ class UserController extends BaseController
      */
     public function accountAction()
     {
+        $strErrorDesc = '';
+        $requestMethod = $_SERVER["REQUEST_METHOD"];
 
+        if (strtoupper($requestMethod) == 'POST') {
+            // get posted data
+            $data = json_decode(file_get_contents("php://input", true));
+            try {
+                $userModel = new UserModel();
+                $cacheService = new RedisCacheService();
+
+                //Check Redis
+                $resultCacheJson = $cacheService->get(REDIS_PREFIX_TOKEN.$data->token);
+                if ($resultCacheJson) {
+                    $resultDbArr = $userModel->getUserByEmail(json_decode($resultCacheJson), 1);
+                    if (count($resultDbArr) < 1) {
+                        $strErrorDesc = json_encode(array('error' => 'Invalid User'));
+                    } else {
+                        $responseData = json_encode($resultDbArr);
+                    }
+                } else {
+                    $strErrorDesc = json_encode(array('error' => 'You token expired or not exist'));
+                }
+            } catch (Error $e) {
+                $strErrorDesc = $e->getMessage().'Something went wrong! Please contact support.';
+                $strErrorHeader = 'HTTP/1.1 500 Internal Server Error';
+            }
+        } else {
+            $strErrorDesc = 'Method not supported';
+            $strErrorHeader = 'HTTP/1.1 422 Unprocessable Entity';
+        }
+
+        // send output
+        if (!$strErrorDesc) {
+            $this->sendOutput(
+                $responseData,
+                array('Content-Type: application/json', 'HTTP/1.1 200 OK')
+            );
+        } else {
+            $this->sendOutput(json_encode(array('error' => $strErrorDesc)),
+                array('Content-Type: application/json', $strErrorHeader)
+            );
+        }
     }
 
     /**
