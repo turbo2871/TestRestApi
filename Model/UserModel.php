@@ -54,4 +54,18 @@ class UserModel extends Database
 
         return $this->delete("DELETE FROM users WHERE id = ?", $paramsArr);
     }
+
+    public function updateUser($userDataObj)
+    {
+        $paramsArr = array(
+            array('param' => 1, 'value' => $userDataObj->username),
+            array('param' => 2, 'value' => $userDataObj->password),
+            array('param' => 3, 'value' => $userDataObj->user_email),
+            array('param' => 4, 'value' => $userDataObj->id),
+        );
+
+        $sqlQuery = "UPDATE users SET username = ?, password = ?, user_email = ? WHERE id = ?";
+
+        return $this->update($sqlQuery, $paramsArr);
+    }
 }

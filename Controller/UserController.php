@@ -236,4 +236,46 @@ class UserController extends BaseController
             );
         }
     }
+
+    /**
+     * "/user/update" Endpoint - User registered by creating username and password
+     */
+    public function updateAction()
+    {
+        $strErrorDesc = '';
+        $requestMethod = $_SERVER["REQUEST_METHOD"];
+
+        if (strtoupper($requestMethod) == 'PUT') {
+            // get posted data
+            $data = json_decode(file_get_contents("php://input", true));
+            try {
+                $userModel = new UserModel();
+
+                if ($userModel->updateUser($data)) {
+                    $responseData = json_encode(array('success' => "User data updated."));
+                } else {
+                    $strErrorDesc = 'Data could not be updated';
+                    $strErrorHeader = 'HTTP/1.1 404 The requested resource was not found';
+                }
+            } catch (Error $e) {
+                $strErrorDesc = $e->getMessage().'Something went wrong! Please contact support.';
+                $strErrorHeader = 'HTTP/1.1 500 Internal Server Error';
+            }
+        } else {
+            $strErrorDesc = 'Method not supported';
+            $strErrorHeader = 'HTTP/1.1 422 Unprocessable Entity';
+        }
+
+        // send output
+        if (!$strErrorDesc) {
+            $this->sendOutput(
+                $responseData,
+                array('Content-Type: application/json', 'HTTP/1.1 200 OK')
+            );
+        } else {
+            $this->sendOutput(json_encode(array('error' => $strErrorDesc)),
+                array('Content-Type: application/json', $strErrorHeader)
+            );
+        }
+    }
 }

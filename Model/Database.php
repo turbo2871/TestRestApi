@@ -51,6 +51,21 @@ class Database
         return false;
     }
 
+    public function update($query = "" , $params = [])
+    {
+        try {
+            $stmt = $this->executeStatement($query, $params);
+            if ($stmt->rowCount() > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        }catch(Exception $e) {
+            throw New Exception( $e->getMessage() );
+        }
+        return false;
+    }
+
     private function executeStatement($query = "", $params = [])
     {
         try {
