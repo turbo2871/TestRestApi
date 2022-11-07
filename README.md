@@ -25,3 +25,26 @@
 ### Test project
 
 1. Used Chrome ARC extension(Advanced Rest Client with Request to “Use XHR extension” switch + ARC cookie exchange)
+2. Api test:
+> Users List:
+>>     Allow-Methods: GET, Endpoint: https://api.local/user/list?limit=20
+
+> Register(Create) User:
+>>     Allow-Methods: POST, Endpoint: https://api.local/user/register
+>>     Request: {"username":"Bob", "password":"bobpass", "user_email":"bob@com"}
+
+> Create token (login) User:
+>>     Allow-Methods: POST, Endpoint: https://api.local/user/token
+>>     Request: {"username": "Greg", "password": "gregpassword"}
+
+> Return user information for user token:
+>>     Allow-Methods: POST, Endpoint: https://api.local/user/account
+>>     Request: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlRlZCIsInVzZXJfZW1haWwiOiJ0ZWRAY29tIiwiZXhwIjoxNjY3ODA1MDUwfQ.-0_97NO8HsQxMY7G6rCDIXKLUSP6iuDwDUp3iI-koL0"}
+
+> Delete user:
+>>     Allow-Methods: DELETE, Endpoint: https://api.local/user/delete
+>>     Request: {"id": 34}
+
+> Update user:
+>>     Allow-Methods: PUT, Endpoint: https://api.local/user/update
+>>     Request: {"id": "2", "username": "Greg", "password": "gregpassword", "user_email": "Greg@com"}
